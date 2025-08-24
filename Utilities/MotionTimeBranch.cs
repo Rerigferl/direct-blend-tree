@@ -1,6 +1,6 @@
 ﻿namespace Numeira;
 
-internal sealed class MotionTimeBranch : MotionBranch
+public sealed class MotionTimeBranch : MotionBranch
 {
     public string BlendParameter { get; set; } = "";
 
