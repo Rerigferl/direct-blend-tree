@@ -2,7 +2,7 @@
 using System.Reflection.Emit;
 
 namespace Numeira;
-internal class DirectBlendTree : BlendTreeBase
+public class DirectBlendTree : BlendTreeBase
 {
     public static string DefaultDirectBlendParameter { get; set; } = "1";
 

@@ -1,7 +1,7 @@
 ﻿
 namespace Numeira;
 
-internal class MotionBranch : IBlendTree
+public class MotionBranch : IBlendTree
 {
     public Motion Motion { get; set; }
 
