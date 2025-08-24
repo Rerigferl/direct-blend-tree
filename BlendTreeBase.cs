@@ -1,6 +1,6 @@
 ﻿namespace Numeira;
 
-public abstract class BlendTreeBase : IBlendTree
+internal abstract class BlendTreeBase : IBlendTree
 {
     public List<(IBlendTree BlendTree, float? threshold)> Children { get; } = new();
 

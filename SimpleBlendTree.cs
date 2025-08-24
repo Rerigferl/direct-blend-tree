@@ -1,6 +1,6 @@
 ﻿namespace Numeira;
 
-public sealed class SimpleBlendTree : BlendTreeBase
+internal sealed class SimpleBlendTree : BlendTreeBase
 {
     public string BlendParameter { get; set; } = "";
 

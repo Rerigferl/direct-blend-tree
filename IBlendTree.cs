@@ -1,6 +1,6 @@
 ﻿namespace Numeira;
 
-public interface IBlendTree
+internal interface IBlendTree
 {
     void Append(IBlendTree blendTree, float? threshold = null);
     void Build(BlendTree blendTree, float? threshold = null);

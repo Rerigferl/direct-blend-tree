@@ -1,6 +1,6 @@
 ﻿namespace Numeira;
 
-public static class BlendTreeExt
+internal static class BlendTreeExt
 {
     public static SimpleBlendTree AddBlendTree(this IBlendTree blendTree, string name = "", float? threshold = null)
         => blendTree.AddTo(new SimpleBlendTree() { Name = name }, threshold);

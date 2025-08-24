@@ -1,6 +1,6 @@
 ﻿namespace Numeira;
 
-public sealed class ExponentialSmoothingBlendTree : SmoothingBlendTree
+internal sealed class ExponentialSmoothingBlendTree : SmoothingBlendTree
 {
     public string SmoothAmountParameterName { get; set; } = "";
 
@@ -40,7 +40,7 @@ public sealed class ExponentialSmoothingBlendTree : SmoothingBlendTree
     }
 }
 
-public abstract class SmoothingBlendTree : IBlendTree
+internal abstract class SmoothingBlendTree : IBlendTree
 {
     public string Name { get; set; } = "";
 
