@@ -13,7 +13,9 @@ internal class MotionBranch : IBlendTree
     }
 
     void IBlendTree.Append(IBlendTree blendTree, float? threshold) { }
-    void IBlendTree.Build(BlendTree blendTree, float? threshold)
+    void IBlendTree.Build(BlendTree blendTree, float? threshold) => Build(blendTree, threshold);
+
+    protected virtual void Build(BlendTree blendTree, float? threshold)
     {
         blendTree.AddChild(Motion, threshold ?? 0);
     }

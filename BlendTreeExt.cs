@@ -3,18 +3,21 @@
 internal static class BlendTreeExt
 {
     public static SimpleBlendTree AddBlendTree(this IBlendTree blendTree, string name = "", float? threshold = null)
-        => blendTree.AddTo(new SimpleBlendTree() { Name = name }, threshold);
+        => blendTree.Add(new SimpleBlendTree() { Name = name }, threshold);
 
     public static DirectBlendTree AddDirectBlendTree(this IBlendTree blendTree, string name = "", float? threshold = null)
-        => blendTree.AddTo(new DirectBlendTree() { Name = name }, threshold);
+        => blendTree.Add(new DirectBlendTree() { Name = name }, threshold);
 
     public static MotionBranch AddMotion(this IBlendTree blendTree, Motion motion, float? threshold = null)
-        => blendTree.AddTo(new MotionBranch(motion), threshold);
+        => blendTree.Add(new MotionBranch(motion), threshold);
 
     public static ExponentialSmoothingBlendTree AddExponentialSmoothing(this IBlendTree blendTree, float? threshold = null)
-        => blendTree.AddTo(new ExponentialSmoothingBlendTree(), threshold);
+        => blendTree.Add(new ExponentialSmoothingBlendTree(), threshold);
 
-    private static T AddTo<T>(this IBlendTree blendTree, T value, float? threshold) where T : IBlendTree
+    public static MotionTimeBranch AddMotionTime(this IBlendTree blendTree, AnimationClip motion, float? threshold = null)
+        => blendTree.Add(new MotionTimeBranch(motion), threshold);
+
+    private static T Add<T>(this IBlendTree blendTree, T value, float? threshold) where T : IBlendTree
     {
         blendTree.Append(value, threshold);
         return value;
