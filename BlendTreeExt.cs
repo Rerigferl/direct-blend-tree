@@ -23,11 +23,11 @@ public static class BlendTreeExt
         return value;
     }
 
-    public static T? Find<T>(this BlendTreeBase blendTree, string name) where T : IBlendTree
+    public static T? Find<T>(this BlendTreeBase blendTree, ReadOnlySpan<char> name) where T : IBlendTree
     {
         foreach (var (child, _) in blendTree.Children.AsSpan())
         {
-            if (child is T x && x.Name == name)
+            if (child is T x && name.Equals(x.Name, StringComparison.Ordinal))
             {
                 return x;
             }
