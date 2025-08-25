@@ -1,6 +1,6 @@
 ﻿namespace Numeira;
 
-public abstract class BlendTreeBase : IBlendTree
+public abstract class BlendTreeBase : IBlendTree, IBlendTreeFactory
 {
     public List<(IBlendTree BlendTree, float? threshold)> Children { get; } = new();
 
@@ -11,7 +11,18 @@ public abstract class BlendTreeBase : IBlendTree
         Children.Add((blendTree, threshold));
     }
 
-    protected abstract void Build(BlendTree blendTree, float? threshold = null);
+    private BlendTree? cache;
 
     void IBlendTree.Build(BlendTree blendTree, float? threshold) => Build(blendTree, threshold);
+    protected virtual void Build(BlendTree blendTree, float? threshold = null)
+    {
+        cache = cache != null ? cache : Build();
+        if (cache == null)
+            return;
+        blendTree.AddChild(cache, threshold ?? 0);
+    }
+
+    BlendTree? IBlendTreeFactory.Build() => Build();
+    protected abstract BlendTree? Build();
+
 }

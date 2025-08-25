@@ -6,52 +6,45 @@ public class DirectBlendTree : BlendTreeBase
 {
     public static string DefaultDirectBlendParameter { get; set; } = "1";
 
-    public string DirectBlendParameter { get; set; } = DefaultDirectBlendParameter; 
+    public string DirectBlendParameter { get; set; } = DefaultDirectBlendParameter;
+    public bool NormalizedBlendValues { get; set; } = false;
 
-    public BlendTree Build(Object? assetContainer = null)
+    public BlendTree ToBlendTree(Object? assetContainer)
     {
-        var tree = CreateDirectBlendTree();
-        tree.name = $"{tree.name}(WD On)";
-        void Recursive(BlendTree tree)
-        {
-            if (assetContainer != null)
-                AssetDatabase.AddObjectToAsset(tree, assetContainer);
+        HashSet<Object>? container = null;
+        if (assetContainer != null) 
+            container = new HashSet<Object>();
 
-            var children = tree.children;
-            foreach (ref var x in children.AsSpan())
+        var tree = ToBlendTree(container);
+        if (container != null)
+        {
+            foreach(Object obj in container)
             {
-                if (x.motion is BlendTree bt)
-                {
-                    Recursive(bt);
-                }
+                AssetDatabase.AddObjectToAsset(obj, assetContainer);
             }
-            tree.children = children;
         }
-        Recursive(tree);
         return tree;
     }
 
-    protected override void Build(BlendTree blendTree, float? threshold = null)
+    public BlendTree ToBlendTree(HashSet<Object>? assetContainer = null)
     {
-        blendTree.AddChild(CreateDirectBlendTree(), threshold ?? 0);
-    }
+        var tree = (this as IBlendTreeFactory).Build()!;
+        tree.name = $"{tree.name}(WD On)";
+        void Recursive(Motion motion)
+        {
+            assetContainer?.Add(motion);
 
-    private BlendTree CreateDirectBlendTree()
-    {
-        var blendTree = new BlendTree();
-        blendTree.name = Name;
-        blendTree.blendType = BlendTreeType.Direct;
-        SetNormalizedBlendValues(blendTree, false);
-        foreach (var (child, _) in Children)
-        {
-            child.Build(blendTree);
+            if (motion is BlendTree tree)
+            {
+                var children = tree.children;
+                foreach (var x in children.AsSpan())
+                {
+                    Recursive(x.motion);
+                }
+            }
         }
-        int count = blendTree.children.Length;
-        for (int i = 0; i < count; i++)
-        {
-            blendTree.SetDirectBlendTreeParameter(i, DirectBlendParameter);
-        }
-        return blendTree;
+        Recursive(tree);
+        return tree;
     }
 
     private static void SetNormalizedBlendValues(BlendTree blendTree, bool value)
@@ -59,6 +52,26 @@ public class DirectBlendTree : BlendTreeBase
         using var so = new SerializedObject(blendTree);
         so.FindProperty("m_NormalizedBlendValues").boolValue = value;
         so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    protected override BlendTree? Build()
+    {
+        var blendTree = new BlendTree();
+        blendTree.name = Name;
+        blendTree.blendType = BlendTreeType.Direct;
+        SetNormalizedBlendValues(blendTree, NormalizedBlendValues);
+        var children = Children.AsSpan();
+        foreach (var (child, _) in children)
+        {
+            child.Build(blendTree);
+        }
+
+        int count = blendTree.children.Length;
+        for (int i = 0; i < count; i++)
+        {
+            blendTree.SetDirectBlendTreeParameter(i, children[i].BlendTree.DirectBlendParameter ?? DirectBlendParameter);
+        }
+        return blendTree;
     }
 }
 

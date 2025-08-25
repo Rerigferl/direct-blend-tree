@@ -4,7 +4,7 @@ public sealed class ExponentialSmoothingBlendTree : SmoothingBlendTree
 {
     public string SmoothAmountParameterName { get; set; } = "";
 
-    public override void Build(BlendTree blendTree, float? threshold = null)
+    protected override BlendTree? Build()
     {
         var tree = new BlendTree
         {
@@ -36,21 +36,19 @@ public sealed class ExponentialSmoothingBlendTree : SmoothingBlendTree
         tree.AddChild(a, 0);
         tree.AddChild(b, 1);
 
-        blendTree.AddChild(tree, threshold ?? 0);
+        return tree;
     }
 }
 
-public abstract class SmoothingBlendTree : IBlendTree
+public abstract class SmoothingBlendTree : IBlendTree, IBlendTreeFactory
 {
     public string Name { get; set; } = "";
 
     public string InputParameterName { get; set; } = "";
     public string OutputParameterName { get; set; } = "";
 
-
     public void Append(IBlendTree blendTree, float? threshold = null)
     { }
-
 
     protected static EditorCurveBinding CreateAAPBinding(string name)
         => new() { path = "", propertyName = name, type = typeof(Animator) };
@@ -63,5 +61,16 @@ public abstract class SmoothingBlendTree : IBlendTree
         return motion;
     }
 
-    public abstract void Build(BlendTree blendTree, float? threshold = null);
+    private BlendTree? cache;
+    public void Build(BlendTree blendTree, float? threshold = null)
+    {
+        cache = cache != null ? cache : Build();
+        if (cache == null)
+            return;
+        blendTree.AddChild(cache, threshold ?? 0);
+    }
+
+    protected abstract BlendTree? Build();
+
+    BlendTree? IBlendTreeFactory.Build() => Build();
 }

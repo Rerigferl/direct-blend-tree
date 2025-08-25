@@ -1,28 +1,20 @@
 ﻿namespace Numeira;
 
-public sealed class MotionTimeBranch : MotionBranch
+public sealed class MotionTimeBranch : MotionBranch, IBlendTreeFactory
 {
     public string BlendParameter { get; set; } = "";
 
     public MotionTimeBranch(AnimationClip motion) : base(motion) { }
 
+    private BlendTree? cache;
+
     protected override void Build(BlendTree blendTree, float? threshold)
     {
-        if (Motion == null || Motion is not AnimationClip clip)
+        cache = cache != null ? cache : (this as IBlendTreeFactory).Build();
+        if (cache == null)
             return;
 
-            var tree = new BlendTree();
-            tree.blendParameter = BlendParameter;
-            tree.name = Name ?? clip.name;
-            tree.useAutomaticThresholds = false;
-
-        foreach(var x in Enumerate())
-            {
-                x.Motion.name = $"{clip.name}({x.Threshold:f2})";
-                tree.AddChild(x.Motion, x.Threshold);
-            }
-
-        blendTree.AddChild(tree, threshold ?? 0);
+        blendTree.AddChild(cache, threshold ?? 0);
     }
 
     private IEnumerable<(AnimationClip Motion, float Threshold)> Enumerate()
@@ -52,5 +44,24 @@ public sealed class MotionTimeBranch : MotionBranch
 
             yield return (newClip, sortedTimes[i] / source.length);
         }
+    }
+
+    BlendTree? IBlendTreeFactory.Build()
+    {
+        if (Motion == null || Motion is not AnimationClip clip)
+            return null;
+
+        var tree = new BlendTree();
+        tree.blendParameter = BlendParameter;
+        tree.name = Name ?? clip.name;
+        tree.useAutomaticThresholds = false;
+
+        foreach (var x in Enumerate())
+        {
+            x.Motion.name = $"{clip.name}({x.Threshold:f2})";
+            tree.AddChild(x.Motion, x.Threshold);
+        }
+
+        return tree;
     }
 }
