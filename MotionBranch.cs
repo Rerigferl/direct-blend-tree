@@ -4,8 +4,9 @@ namespace Numeira;
 public class MotionBranch : IBlendTree
 {
     public Motion Motion { get; set; }
+    public string? Name { get; set; } = null;
 
-    string IBlendTree.Name => Motion.name;
+    string IBlendTree.Name => Name ?? Motion.name;
 
     public MotionBranch(Motion motion)
     {

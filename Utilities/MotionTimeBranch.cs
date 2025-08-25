@@ -11,16 +11,16 @@ public sealed class MotionTimeBranch : MotionBranch
         if (Motion == null || Motion is not AnimationClip clip)
             return;
 
-        var tree = new BlendTree();
-        tree.blendParameter = BlendParameter;
-        tree.name = clip.name;
-        tree.useAutomaticThresholds = false;
+            var tree = new BlendTree();
+            tree.blendParameter = BlendParameter;
+            tree.name = Name ?? clip.name;
+            tree.useAutomaticThresholds = false;
 
         foreach(var x in Enumerate())
-        {
-            x.Motion.name = $"{clip.name}({x.Threshold:f2})";
-            tree.AddChild(x.Motion, x.Threshold);
-        }
+            {
+                x.Motion.name = $"{clip.name}({x.Threshold:f2})";
+                tree.AddChild(x.Motion, x.Threshold);
+            }
 
         blendTree.AddChild(tree, threshold ?? 0);
     }
